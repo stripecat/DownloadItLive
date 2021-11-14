@@ -38,9 +38,9 @@ $MoveSeparateFiles = 1 # 1 = Move every file one-by-one. 0 = Move ALL downloaded
 #----------------[ Functions ]------------------------------------------------------
 
 function Copy-Files($source, $destination) {
-  $ErrorActionPreference = "stop"
+  $ErrorActionPreference = "Stop"
   try {
-    Copy-Item -Path "$source" -Destination "$destination" -Force
+    Copy-Item -Path "$source" -Destination "$destination" -Force -ErrorAction Stop
   }
   catch {
     Logwrite ("Copy-Files: Could not copy " + $source + " to " + $destination + " Given EC:" + $_ + ".")
