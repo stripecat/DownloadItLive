@@ -11,3 +11,6 @@ How to install
 - Setup PIL accordingly. I guess a "Monitored folder" is a good start.
 - All logs will be stored under Logs.
 
+Disclaimer
+
+I take no responsibility for and problems and ill-effects of using this script. Please make sure to read through the manual and the script before using it. It should be pretty self-explanatory.
