@@ -68,8 +68,6 @@ if ((Test-path $Temp_dir) -eq $false) { New-Item -path $Temp_dir -ItemType "dire
 if ((Test-path $LogDir) -eq $false) { New-Item -path $LogDir -ItemType "directory"}
 if ((Test-path ($LogDir + "Log.txt")) -eq $false) { New-Item -path ($LogDir + "Log.txt") -ItemType "file"}
 
-
-
 # Main execution
 
 $SuccessFullFiles = New-Object System.Collections.ArrayList
