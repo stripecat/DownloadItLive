@@ -12,6 +12,7 @@
   C:\Scripts\
   
 .NOTES
+    Updated: 2021-11-15     Added check for changed files for you statistics buffs out there. :) //EZS
     Updated: 2021-11-14     Initial release. //EZS
     Release Date: 2021-11-14
    
@@ -33,12 +34,62 @@ $NewsURLs = "http://www.fsnradionews.com/FSNNews/FSNBulletin.mp3", "http://www.f
 $Destination_dir = $InitDir + "\PublicFiles"
 $LogDir = $InitDir + "\Logs\"
 $Temp_dir = $InitDir + "\Temporary"
+$ReportFileChange = 1 # If set to 1 it will report if a file has changed between the downloads. If set to 0, it will not.
 $MoveSeparateFiles = 1 # 1 = Move every file one-by-one. 0 = Move ALL downloaded files or none at all (1 failed download means NOTHING get moved into the destination)
 
 #----------------[ Functions ]------------------------------------------------------
 
-function Copy-Files($source, $destination) {
+Function Test-Hash ($SourceFile, $DestinationFile) {
+  # This function checks if the hashes of two files are the same.
+  # This is NOT a security function! It's only used make it possible to see if
+  # a news cast has changed between two downloads for statistics and troubleshooting.
+
+  $SF = (get-filehash $SourceFile).hash.tostring()
+  
+  $rc = $SourceFile -match '([^\\]*)$'
+  $URLFile = $rc
+  $URLFile = $Matches[1]
+
+
+  $DF = (get-filehash $DestinationFile).hash.tostring()
+
+  # Uncomment to debug.
+  #Logwrite ("Source:" + $SourceFile + ":" + $SF)
+  #Logwrite ("Destionation" + $DestinationFile + ":" + $DF)
+
+  if ($SF -eq $DF) {
+    Logwrite ($URLFile + " The file is the same as when it was last downloaded.")
+  }
+  else {
+    Logwrite ("[CHANGE] " + $URLFile + " The file has changed since it was last downloade.")
+  }
+
+}
+
+Function Copy-Files($source, $destination) {
   $ErrorActionPreference = "Stop"
+
+  $rc = $source -match '([^\\]*)$'
+  $URLFile = $rc
+  $URLFile = $Matches[1]
+
+  if ($ReportFileChange -eq 1) {
+    try {
+      if (Test-Path $destination) {
+        Test-Hash $source $destination
+      }
+      else {
+        Logwrite ("[CHANGE] " + $URLFile + " The file is downloaded for the first time.")
+      }
+  
+    }
+    catch {
+      Logwrite ("[Error] An unknown error occurred in Copy-Files.")
+    }
+  }
+
+  $ErrorActionPreference = "Stop"
+
   try {
     Copy-Item -Path "$source" -Destination "$destination" -Force -ErrorAction Stop
   }
@@ -47,6 +98,8 @@ function Copy-Files($source, $destination) {
   }
   
 }
+
+
 
 Function Logwrite ($message, $todisk = 1, $LD = $LogDir) {
   $ts = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
@@ -63,10 +116,10 @@ Function Logwrite ($message, $todisk = 1, $LD = $LogDir) {
 
 # Create the folders if they do not exist.
 
-if ((Test-path $Destination_dir) -eq $false) { New-Item -path $Destination_dir -ItemType "directory"}
-if ((Test-path $Temp_dir) -eq $false) { New-Item -path $Temp_dir -ItemType "directory"}
-if ((Test-path $LogDir) -eq $false) { New-Item -path $LogDir -ItemType "directory"}
-if ((Test-path ($LogDir + "Log.txt")) -eq $false) { New-Item -path ($LogDir + "Log.txt") -ItemType "file"}
+if ((Test-path $Destination_dir) -eq $false) { New-Item -path $Destination_dir -ItemType "directory" }
+if ((Test-path $Temp_dir) -eq $false) { New-Item -path $Temp_dir -ItemType "directory" }
+if ((Test-path $LogDir) -eq $false) { New-Item -path $LogDir -ItemType "directory" }
+if ((Test-path ($LogDir + "Log.txt")) -eq $false) { New-Item -path ($LogDir + "Log.txt") -ItemType "file" }
 
 # Main execution
 
@@ -131,7 +184,7 @@ if ($FailedFiles.count -eq 0 -and $MoveSeparateFiles -eq 0) {
     Logwrite ("Copying " + ($Temp_dir + "\" + $URLFile) + " to " + ($Destination_dir + "\") + " for " + $SuccessFullFile + "." )
 
     try {
-      Copy-Files ($Temp_dir + "\" + $URLFile) ($Destination_dir + "\")
+      Copy-Files ($Temp_dir + "\" + $URLFile) ($Destination_dir + "\" + $URLFile) 
     }
     catch {
       Logwrite ("Could not copy " + ($Temp_dir + "\" + $URLFile) + " to " + ($Destination_dir + "\") + " Given EC:" + $_ + ".")
