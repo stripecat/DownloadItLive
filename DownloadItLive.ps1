@@ -61,7 +61,7 @@ Function Test-Hash ($SourceFile, $DestinationFile) {
     Logwrite ($URLFile + " The file is the same as when it was last downloaded.")
   }
   else {
-    Logwrite ("[CHANGE] " + $URLFile + " The file has changed since it was last downloade.")
+    Logwrite ("[CHANGE] " + $URLFile + " The file has changed since it was last downloaded.")
   }
 
 }
