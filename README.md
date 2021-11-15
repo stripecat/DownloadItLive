@@ -1,5 +1,5 @@
 # DownloadItLive
-A news downloader for PlayIT Live from PlayIt Software.
+A news downloader for PlayIt Live from PlayIt Software.
 
 How to install
 
