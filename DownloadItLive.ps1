@@ -12,6 +12,7 @@
   C:\Scripts\
   
 .NOTES
+    Updated: 2021-11-29     Version 1.0.1. Added creation of a timestamp file if you want to tell your listeners when the news cast last changed. //EZS
     Updated: 2021-11-15     Added check for changed files for you statistics buffs out there. :) //EZS
     Updated: 2021-11-14     Initial release. //EZS
     Release Date: 2021-11-14
