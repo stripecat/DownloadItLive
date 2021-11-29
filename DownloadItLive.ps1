@@ -37,7 +37,7 @@ $LogDir = $InitDir + "\Logs\"
 $Temp_dir = $InitDir + "\Temporary"
 $ReportFileChange = 1 # If set to 1 it will report if a file has changed between the downloads. If set to 0, it will not.
 $MoveSeparateFiles = 1 # 1 = Move every file one-by-one. 0 = Move ALL downloaded files or none at all (1 failed download means NOTHING get moved into the destination)
-$ChangeFile = $InitDir + "\ChangeFile\" # This will note the last time any of the file were changed. This can be used to state the age of the news cast.
+$ChangeFile = $InitDir + "\ChangeFile\" # This will note the last time any of the files were changed. This can be used to state the age of the news cast.
 
 #----------------[ Functions ]------------------------------------------------------
 
