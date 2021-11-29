@@ -36,6 +36,7 @@ $LogDir = $InitDir + "\Logs\"
 $Temp_dir = $InitDir + "\Temporary"
 $ReportFileChange = 1 # If set to 1 it will report if a file has changed between the downloads. If set to 0, it will not.
 $MoveSeparateFiles = 1 # 1 = Move every file one-by-one. 0 = Move ALL downloaded files or none at all (1 failed download means NOTHING get moved into the destination)
+$ChangeFile = $InitDir + "\ChangeFile\" # This will note the last time any of the file were changed. This can be used to state the age of the news cast.
 
 #----------------[ Functions ]------------------------------------------------------
 
@@ -62,6 +63,8 @@ Function Test-Hash ($SourceFile, $DestinationFile) {
   }
   else {
     Logwrite ("[CHANGE] " + $URLFile + " The file has changed since it was last downloaded.")
+    $cts = Get-Date -Format "HH:mm"
+    $cts|out-file ($ChangeFile + "LatestChange.txt")
   }
 
 }
@@ -80,6 +83,8 @@ Function Copy-Files($source, $destination) {
       }
       else {
         Logwrite ("[CHANGE] " + $URLFile + " The file is downloaded for the first time.")
+        $cts = Get-Date -Format "HH:mm"
+        $cts|out-file ($ChangeFile + "LatestChange.txt")
       }
   
     }
@@ -120,6 +125,13 @@ if ((Test-path $Destination_dir) -eq $false) { New-Item -path $Destination_dir -
 if ((Test-path $Temp_dir) -eq $false) { New-Item -path $Temp_dir -ItemType "directory" }
 if ((Test-path $LogDir) -eq $false) { New-Item -path $LogDir -ItemType "directory" }
 if ((Test-path ($LogDir + "Log.txt")) -eq $false) { New-Item -path ($LogDir + "Log.txt") -ItemType "file" }
+if ((Test-path ($ChangeFile)) -eq $false) {
+  New-Item -path ($ChangeFile) -ItemType "directory" 
+  New-Item -path ($ChangeFile + "LatestChange.txt") -ItemType "file" 
+  $cts = Get-Date -Format "HH:mm"
+  $cts | out-file ($ChangeFile + "LatestChange.txt")
+}
+
 
 # Main execution
 
@@ -127,7 +139,7 @@ $SuccessFullFiles = New-Object System.Collections.ArrayList
 $FailedFiles = New-Object System.Collections.ArrayList
 
 Logwrite ("******************* *************************** Started.")
-Logwrite ("DownloadItLive version 1.0, created by Erik Zalitis on ericade.radio. erik@zalitis.se.")
+Logwrite ("DownloadItLive version 1.1, created by Erik Zalitis on ericade.radio. erik@zalitis.se.")
 
 
 if ($MoveSeparateFiles -eq 0) { Logwrite ("Script is set only to copy new files if ALL can be downloaded.") }
@@ -150,7 +162,7 @@ foreach ($NewsURL in $NewsURLs) {
 
     $Response = Invoke-WebRequest $NewsURL -OutFile ($Temp_dir + "\" + $URLFile) -PassThru 
 
-    # All lines below in the Fry-block will only execute if the Invoke-WebRequest does not cast an error.
+    # All lines below in the Try-block will only execute if the Invoke-WebRequest does not cast an error.
     $StatusCode = $Response.StatusCode
 
     if ($MoveSeparateFiles -eq 1 -and $StatusCode -eq "200") { 
